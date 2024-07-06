@@ -28,6 +28,19 @@ private:
 		DWORD ESP;
 		std::bitset<31> EFLAGS;
 	};
+
+	struct segment_registers {
+		WORD CS;
+		WORD DS;
+		WORD SS;
+		WORD ES;
+		WORD FS;
+		WORD GS;
+	};
+
+	enum modes_of_operation {PROTECTED, REAL_ADDRESS, 
+		                     SYSTEM_MANAGEMENT, COMPATIBILITY, 
+		                     X64_MODE}; // modes of CPU operation
 	
 	DWORD EIP; // instruction pointer
 
