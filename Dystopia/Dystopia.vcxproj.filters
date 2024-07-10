@@ -18,12 +18,24 @@
     <ClCompile Include="Dystopia.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="CPU.cpp">
+    <ClCompile Include="CPU\CPU.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CPU\ALU.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CPU\CU.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="CPU.h">
+    <ClInclude Include="CPU\CPU.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CPU\ALU.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CPU\CU.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

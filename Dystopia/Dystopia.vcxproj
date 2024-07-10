@@ -129,15 +129,15 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="ALU.cpp" />
-    <ClCompile Include="CPU.cpp" />
-    <ClCompile Include="CU.cpp" />
+    <ClCompile Include="CPU\ALU.cpp" />
+    <ClCompile Include="CPU\CPU.cpp" />
+    <ClCompile Include="CPU\CU.cpp" />
     <ClCompile Include="Dystopia.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="ALU.h" />
-    <ClInclude Include="CPU.h" />
-    <ClInclude Include="CU.h" />
+    <ClInclude Include="CPU\ALU.h" />
+    <ClInclude Include="CPU\CPU.h" />
+    <ClInclude Include="CPU\CU.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
