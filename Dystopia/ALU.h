@@ -1,4 +1,6 @@
 #pragma once
+
+
 class ALU
 {
 private:
@@ -7,6 +9,7 @@ private:
 	};
 
 	enum InstructionType {
+		// these MIGHT be not a part of ALU, but CU, but for now i have no idea
 		DataTransfer = 1,
 		BinaryArithmetic = 2,
 		DecimalArithmetic = 3,

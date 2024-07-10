@@ -131,11 +131,13 @@
   <ItemGroup>
     <ClCompile Include="ALU.cpp" />
     <ClCompile Include="CPU.cpp" />
+    <ClCompile Include="CU.cpp" />
     <ClCompile Include="Dystopia.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ALU.h" />
     <ClInclude Include="CPU.h" />
+    <ClInclude Include="CU.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
