@@ -2,7 +2,7 @@
 //
 
 #include <iostream>
-#include "CPU.h"
+#include "CPU/CPU.h"
 
 int main()
 {
