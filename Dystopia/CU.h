@@ -13,7 +13,26 @@ using QWORD = uint64_t; // 64 bit value
 class CU
 {
 private:
-	struct x86_general_purpose_registers {
+	struct general_purpose_registers {
+		// 8 bit registers
+		BYTE AL;
+		BYTE BL;
+		BYTE CL;
+		BYTE DL;
+		BYTE AH;
+		BYTE BH;
+		BYTE CH;
+		BYTE DH;
+		// 16 bit registers
+		WORD AX;
+		WORD BX;
+		WORD CX;
+		WORD DX;
+		WORD SI;
+		WORD DI;
+		WORD BP;
+		WORD SP;
+		// 32 bit registers
 		DWORD EAX;
 		DWORD EBX;
 		DWORD ECX;
@@ -22,6 +41,32 @@ private:
 		DWORD EDI;
 		DWORD EBP;
 		DWORD ESP;
+		DWORD R8D;
+		DWORD R9D;
+		DWORD R10D;
+		DWORD R11D;
+		DWORD R12D;
+		DWORD R13D;
+		DWORD R14D;
+		DWORD R15D;
+
+		//64 bit registers
+		QWORD RAX;
+		QWORD RBX;
+		QWORD RCX;
+		QWORD RDX;
+		QWORD RSI;
+		QWORD RDI;
+		QWORD RBP;
+		QWORD RSP;
+		QWORD R8;
+		QWORD R9;
+		QWORD R10;
+		QWORD R11;
+		QWORD R12;
+		QWORD R13;
+		QWORD R14;
+		QWORD R15;
 		std::bitset<31> EFLAGS;
 	};
 
