@@ -1,6 +1,9 @@
 #pragma once
+
 #include <stdint.h>
 #include <bitset>
+#include <iostream>
+
 
 
 using BYTE = uint8_t; // 8 bit value
@@ -9,10 +12,16 @@ using DWORD = uint32_t; // 32 bit value
 using QWORD = uint64_t; // 64 bit value
 
 
+
 // THIS CLASS DESCRIBES CONTROL UNIT OF CPU
 class CU
 {
-private:
+public:
+	CU();
+	~CU();
+	void Decode();
+	void Fetch();
+	void Execute();
 	struct general_purpose_registers {
 		// 8 bit registers
 		BYTE AL;
@@ -68,7 +77,7 @@ private:
 		QWORD R14;
 		QWORD R15;
 		std::bitset<31> EFLAGS;
-	};
+	} general_purpose_registers;
 
 	struct segment_registers {
 		WORD CS;
@@ -104,10 +113,11 @@ private:
 		VIP = 20, // X: Virtual Interrupt Pending
 		ID = 21 // X: ID Flag
 	};
-
+private:
 	DWORD EIP; // instruction pointer
-	void Decode();
-	void Fetch();
-	void Execute(); // instruction to execute
+	CU* controlUnit;
+	
+	
+	
 };
 
