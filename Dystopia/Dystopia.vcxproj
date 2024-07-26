@@ -138,6 +138,7 @@
     <ClCompile Include="Instruction.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Core\Miscellaneous\Types.h" />
     <ClInclude Include="CPU\ALU.h" />
     <ClInclude Include="CPU\CPU.h" />
     <ClInclude Include="CPU\CU.h" />
