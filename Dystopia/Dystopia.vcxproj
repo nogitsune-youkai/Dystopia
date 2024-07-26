@@ -136,6 +136,7 @@
     <ClCompile Include="CPU\CU.cpp" />
     <ClCompile Include="Dystopia.cpp" />
     <ClCompile Include="Instruction.cpp" />
+    <ClCompile Include="Core\Loader\PE.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Core\Miscellaneous\Types.h" />
@@ -144,6 +145,7 @@
     <ClInclude Include="CPU\CU.h" />
     <ClInclude Include="Instruction.h" />
     <ClInclude Include="Opcodes.h" />
+    <ClInclude Include="Core\Loader\PE.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -4,6 +4,7 @@
 /*
 This file is used to specify data types for use in other classes
 */
+constexpr auto Reserved = 0; // reserved values shouldn't be used 
 
 using BYTE = uint8_t; // 8 bit value
 using WORD = uint16_t; // 16 bit value
