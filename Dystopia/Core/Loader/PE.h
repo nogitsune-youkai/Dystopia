@@ -1,6 +1,10 @@
 #pragma once
 #include <bitset>
+#include <variant>
 #include "Core/Miscellaneous/Types.h"
+
+using PhysicalAddress = DWORD;
+using VirtualSize = DWORD;
 
 constexpr BYTE IMAGE_NUMBEROF_DIRECTORY_ENTRIES = 16;
 constexpr WORD IMAGE_DOS_MAGIC = 0x5A4D;
@@ -197,9 +201,11 @@ struct PE32OptionalHeader64 {
 	IMAGE_DATA_DIRECTORY DataDirectory[IMAGE_NUMBEROF_DIRECTORY_ENTRIES];
 } IMAGE_OPTIONAL_HEADER_64, * PIMAGE_OPTIONAL_HEADER_64;
 
+constexpr BYTE IMAGE_SIZEOF_SHORT_NAME = 8;
+
 struct SectionTable {
-	QWORD Name; // An 8 - byte, null - padded UTF - 8 encoded string.If the string is exactly 8 characters long, there is no terminating null.For longer names, this field contains a slash(/ ) that is followed by an ASCII representation of a decimal number that is an offset into the string table.
-	DWORD VirtualSize; // The total size of the section when loaded into memory.If this value is greater than SizeOfRawData, the section is zero - padded.This field is valid only for executable images and should be set to zero for object files.
+	BYTE NAME[IMAGE_SIZEOF_SHORT_NAME]; // An 8 - byte, null - padded UTF - 8 encoded string.If the string is exactly 8 characters long, there is no terminating null.For longer names, this field contains a slash(/ ) that is followed by an ASCII representation of a decimal number that is an offset into the string table.
+	std::variant<PhysicalAddress, VirtualSize> Misc; // VirtualSize - The total size of the section when loaded into memory.If this value is greater than SizeOfRawData, the section is zero - padded.This field is valid only for executable images and should be set to zero for object files.
 	DWORD VirtualAddress; // For executable images, the address of the first byte of the section relative to the image base when the section is loaded into memory. For object files, this field is the address of the first byte before relocation is applied; for simplicity, compilers should set this to zero. Otherwise, it is an arbitrary value that is subtracted from offsets during relocation. 
 	DWORD SizeOfRawData; // The size of the section (for object files) or the size of the initialized data on disk (for image files). For executable images, this must be a multiple of FileAlignment from the optional header. If this is less than VirtualSize, the remainder of the section is zero-filled. Because the SizeOfRawData field is rounded but the VirtualSize field is not, it is possible for SizeOfRawData to be greater than VirtualSize as well. When a section contains only uninitialized data, this field should be zero. 
 	DWORD PointerToRawData; // The file pointer to the first page of the section within the COFF file. For executable images, this must be a multiple of FileAlignment from the optional header. For object files, the value should be aligned on a 4-byte boundary for best performance. When a section contains only uninitialized data, this field should be zero. 
