@@ -20,68 +20,68 @@ public:
 	void Execute();
 	struct general_purpose_registers {
 		// 8 bit registers
-		BYTE AL;
-		BYTE BL;
-		BYTE CL;
-		BYTE DL;
-		BYTE AH;
-		BYTE BH;
-		BYTE CH;
-		BYTE DH;
+		UCHAR AL;
+		UCHAR BL;
+		UCHAR CL;
+		UCHAR DL;
+		UCHAR AH;
+		UCHAR BH;
+		UCHAR CH;
+		UCHAR DH;
 		// 16 bit registers
-		WORD AX;
-		WORD BX;
-		WORD CX;
-		WORD DX;
-		WORD SI;
-		WORD DI;
-		WORD BP;
-		WORD SP;
+		USHORT AX;
+		USHORT BX;
+		USHORT CX;
+		USHORT DX;
+		USHORT SI;
+		USHORT DI;
+		USHORT BP;
+		USHORT SP;
 		// 32 bit registers
-		DWORD EAX;
-		DWORD EBX;
-		DWORD ECX;
-		DWORD EDX;
-		DWORD ESI;
-		DWORD EDI;
-		DWORD EBP;
-		DWORD ESP;
-		DWORD R8D;
-		DWORD R9D;
-		DWORD R10D;
-		DWORD R11D;
-		DWORD R12D;
-		DWORD R13D;
-		DWORD R14D;
-		DWORD R15D;
+		ULONG EAX;
+		ULONG EBX;
+		ULONG ECX;
+		ULONG EDX;
+		ULONG ESI;
+		ULONG EDI;
+		ULONG EBP;
+		ULONG ESP;
+		ULONG R8D;
+		ULONG R9D;
+		ULONG R10D;
+		ULONG R11D;
+		ULONG R12D;
+		ULONG R13D;
+		ULONG R14D;
+		ULONG R15D;
 
 		//64 bit registers
-		QWORD RAX;
-		QWORD RBX;
-		QWORD RCX;
-		QWORD RDX;
-		QWORD RSI;
-		QWORD RDI;
-		QWORD RBP;
-		QWORD RSP;
-		QWORD R8;
-		QWORD R9;
-		QWORD R10;
-		QWORD R11;
-		QWORD R12;
-		QWORD R13;
-		QWORD R14;
-		QWORD R15;
+		ULONGLONG RAX;
+		ULONGLONG RBX;
+		ULONGLONG RCX;
+		ULONGLONG RDX;
+		ULONGLONG RSI;
+		ULONGLONG RDI;
+		ULONGLONG RBP;
+		ULONGLONG RSP;
+		ULONGLONG R8;
+		ULONGLONG R9;
+		ULONGLONG R10;
+		ULONGLONG R11;
+		ULONGLONG R12;
+		ULONGLONG R13;
+		ULONGLONG R14;
+		ULONGLONG R15;
 		std::bitset<31> EFLAGS;
 	} general_purpose_registers;
 
 	struct segment_registers {
-		WORD CS;
-		WORD DS;
-		WORD SS;
-		WORD ES;
-		WORD FS;
-		WORD GS;
+		USHORT CS;
+		USHORT DS;
+		USHORT SS;
+		USHORT ES;
+		USHORT FS;
+		USHORT GS;
 	};
 
 	/*
@@ -110,7 +110,7 @@ public:
 		ID = 21 // X: ID Flag
 	};
 private:
-	DWORD EIP; // instruction pointer
+	ULONG EIP; // instruction pointer
 	CU* controlUnit;
 	
 	
