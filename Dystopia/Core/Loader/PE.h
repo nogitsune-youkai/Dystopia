@@ -11,7 +11,7 @@ constexpr USHORT IMAGE_DOS_MAGIC = 0x5A4D;
 
 struct IMAGE_DOS_HEADER {
 	USHORT   e_magic;                     // Magic number
-	USHORT   e_cblp;                      // UCHARs on last page of file
+	USHORT   e_cblp;                      // bytes on last page of file
 	USHORT   e_cp;                        // Pages in file
 	USHORT   e_crlc;                      // Relocations
 	USHORT   e_cparhdr;                   // Size of header in paragraphs
@@ -92,7 +92,7 @@ constexpr USHORT IMAGE_FILE_AGGRESSIVE_WS_TRIM = 0x0010; // Obsolete. Aggressive
 constexpr USHORT IMAGE_FILE_LARGE_ADDRESS_AWARE = 0x0020; // Application can handle > 2-GB addresses. 
 constexpr USHORT RESERVED_FLAG = 0x0040; // reserved for future use
 constexpr USHORT IMAGE_FILE_UCHARS_REVERSED_LO = 0x0080;
-constexpr USHORT IMAGE_FILE_32BIT_MACHINE = 0x0100; // Machine is based on a 32-bit USHORT architecture.
+constexpr USHORT IMAGE_FILE_32BIT_MACHINE = 0x0100; // Machine is based on a 32-bit word architecture.
 constexpr USHORT IMAGE_FILE_DEBUG_STRIPPED = 0x0200;
 constexpr USHORT IMAGE_FILE_REMOVABLE_RUN_FROM_SWAP = 0x0400;
 constexpr USHORT IMAGE_FILE_NET_RUN_FROM_SWAP = 0x0800;
@@ -123,7 +123,7 @@ struct _IMAGE_OPTIONAL_HEADER64 {
 	ULONG AddressOfEntryPoint; // The address of the entry point relative to the image base when the executable file is loaded into memory. If no entry point is present, this field must be 0.                         
 	ULONG BaseOfCode; // The address that is relative to the image base of the beginning - of - code section when it is loaded into memory.
 	ULONG BaseOfData; // The address that is relative to the image base of the beginning-of-data section when it is loaded into memory. This field is absent to PE32+ format
-	ULONG ImageBase; // The preferred address of the first UCHAR of image when loaded into memory; must be a multiple of 64 K.The default for Windows NT is 0x00400000. Might be a good idea to define it as bit-field
+	ULONG ImageBase; // The preferred address of the first byte of image when loaded into memory; must be a multiple of 64 K.The default for Windows NT is 0x00400000. Might be a good idea to define it as bit-field
 	ULONG SectionAlignment;
 	ULONG FileAlignment;
 	USHORT MajorOperatingSystemVersion;
@@ -177,9 +177,9 @@ struct PE32OptionalHeader64 {
 	ULONG BaseOfCode; // The address that is relative to the image base of the beginning - of - code section when it is loaded into memory.
 	
 	// Windows-Specific Fields
-	USHORT ImageBase; // The preferred address of the first UCHAR of image when loaded into memory; must be a multiple of 64 K.The default for Windows NT is 0x00400000. Might be a good idea to define it as bit-field
-	ULONG SectionAlignment; // The alignment (in UCHARs) of sections when they are loaded into memory. It must be greater than or equal to FileAlignment. The default is the page size for the architecture. 
-	ULONG FileAlignment; // The alignment factor (in UCHARs) that is used to align the raw data of sections in the image file. The value should be a power of 2 between 512 and 64 K, inclusive. The default is 512. If the SectionAlignment is less than the architecture's page size, then FileAlignment must match SectionAlignment. 
+	USHORT ImageBase; // The preferred address of the first byte of image when loaded into memory; must be a multiple of 64 K.The default for Windows NT is 0x00400000. Might be a good idea to define it as bit-field
+	ULONG SectionAlignment; // The alignment (in bytes) of sections when they are loaded into memory. It must be greater than or equal to FileAlignment. The default is the page size for the architecture. 
+	ULONG FileAlignment; // The alignment factor (in bytess) that is used to align the raw data of sections in the image file. The value should be a power of 2 between 512 and 64 K, inclusive. The default is 512. If the SectionAlignment is less than the architecture's page size, then FileAlignment must match SectionAlignment. 
 	USHORT MajorOperatingSystemVersion;
 	USHORT MinorOperatingSystemVersion;
 	USHORT MajorImageVersion;
@@ -204,11 +204,11 @@ struct PE32OptionalHeader64 {
 constexpr UCHAR IMAGE_SIZEOF_SHORT_NAME = 8;
 
 struct SectionTable {
-	UCHAR NAME[IMAGE_SIZEOF_SHORT_NAME]; // An 8 - UCHAR, null - padded UTF - 8 encoded string.If the string is exactly 8 characters long, there is no terminating null.For longer names, this field contains a slash(/ ) that is followed by an ASCII representation of a decimal number that is an offset into the string table.
+	UCHAR NAME[IMAGE_SIZEOF_SHORT_NAME]; // An 8 - byte, null - padded UTF - 8 encoded string.If the string is exactly 8 characters long, there is no terminating null.For longer names, this field contains a slash(/ ) that is followed by an ASCII representation of a decimal number that is an offset into the string table.
 	std::variant<PhysicalAddress, VirtualSize> Misc; // VirtualSize - The total size of the section when loaded into memory.If this value is greater than SizeOfRawData, the section is zero - padded.This field is valid only for executable images and should be set to zero for object files.
-	ULONG VirtualAddress; // For executable images, the address of the first UCHAR of the section relative to the image base when the section is loaded into memory. For object files, this field is the address of the first UCHAR before relocation is applied; for simplicity, compilers should set this to zero. Otherwise, it is an arbitrary value that is subtracted from offsets during relocation. 
+	ULONG VirtualAddress; // For executable images, the address of the first byte of the section relative to the image base when the section is loaded into memory. For object files, this field is the address of the first byte before relocation is applied; for simplicity, compilers should set this to zero. Otherwise, it is an arbitrary value that is subtracted from offsets during relocation. 
 	ULONG SizeOfRawData; // The size of the section (for object files) or the size of the initialized data on disk (for image files). For executable images, this must be a multiple of FileAlignment from the optional header. If this is less than VirtualSize, the remainder of the section is zero-filled. Because the SizeOfRawData field is rounded but the VirtualSize field is not, it is possible for SizeOfRawData to be greater than VirtualSize as well. When a section contains only uninitialized data, this field should be zero. 
-	ULONG PointerToRawData; // The file pointer to the first page of the section within the COFF file. For executable images, this must be a multiple of FileAlignment from the optional header. For object files, the value should be aligned on a 4-UCHAR boundary for best performance. When a section contains only uninitialized data, this field should be zero. 
+	ULONG PointerToRawData; // The file pointer to the first page of the section within the COFF file. For executable images, this must be a multiple of FileAlignment from the optional header. For object files, the value should be aligned on a 4-byte boundary for best performance. When a section contains only uninitialized data, this field should be zero. 
 	ULONG PointerToRelocations; // The file pointer to the beginning of relocation entries for the section. This is set to zero for executable images or if there are no relocations. 
 	ULONG PointerToLineNumbers; // The file pointer to the beginning of line-number entries for the section. This is set to zero if there are no COFF line numbers. This value should be zero for an image because COFF debugging information is deprecated. 
 	USHORT NumberOfRelocations; // The number of relocation entries for the section. This is set to zero for executable images. 
@@ -236,8 +236,8 @@ constexpr ULONG IMAGE_SCN_MEM_PURGEABLE = 0x00020000; // Reserved for future use
 constexpr ULONG IMAGE_SCN_MEM_16BIT = 0x00020000; // Reserved for future use
 constexpr ULONG IMAGE_SCN_MEM_LOCKED = 0x00040000; // Reserved for future use
 constexpr ULONG IMAGE_SCN_MEM_PRELOAD = 0x00080000; // Reserved for future use
-constexpr ULONG IMAGE_SCN_ALIGN_1UCHARS = 0x00100000; // Align data on a 1-UCHAR boundary. Valid only for object files. 
-constexpr ULONG IMAGE_SCN_ALIGN_2UCHARS = 0x00200000; // Align data on a 2-UCHAR boundary. Valid only for object files. 
+constexpr ULONG IMAGE_SCN_ALIGN_1UCHARS = 0x00100000; // Align data on a 1-byte boundary. Valid only for object files. 
+constexpr ULONG IMAGE_SCN_ALIGN_2UCHARS = 0x00200000; // Align data on a 2-byte boundary. Valid only for object files. 
 constexpr ULONG IMAGE_SCN_ALIGN_4UCHARS = 0x00300000;
 constexpr ULONG IMAGE_SCN_ALIGN_8UCHARS = 0x00400000;
 constexpr ULONG IMAGE_SCN_ALIGN_16UCHARS = 0x00500000;
@@ -290,7 +290,7 @@ constexpr USHORT IMAGE_DLLCHARACTERISTICS_GUARD_CF = 0x4000; // Image supports C
 constexpr USHORT IMAGE_DLLCHARACTERISTICS_TERMINAL_SERVER_AWARE = 0x8000; // Terminal Server aware. 
 
 struct _IMAGE_RELOCATION {
-	ULONG VirtualAddress; // The address of the item to which relocation is applied. This is the offset from the beginning of the section, plus the value of the section's RVA/Offset field. See Section Table (Section Headers). For example, if the first UCHAR of the section has an address of 0x10, the third UCHAR has an address of 0x12. 
+	ULONG VirtualAddress; // The address of the item to which relocation is applied. This is the offset from the beginning of the section, plus the value of the section's RVA/Offset field. See Section Table (Section Headers). For example, if the first byte of the section has an address of 0x10, the third byte has an address of 0x12. 
 	ULONG SymbolTableIndex; // A zero-based index into the symbol table. This symbol gives the address that is to be used for the relocation. If the specified symbol has section storage class, then the symbol's address is the address with the first section of the same name. 
 	USHORT Type; // A value that indicates the kind of relocation that should be performed. Valid relocation types depend on machine type. See Type Indicators. 
 };
@@ -303,12 +303,12 @@ constexpr UCHAR IMAGE_REL_AMD64_ABSOLUTE = 0x0000; // The relocation is ignored.
 constexpr UCHAR IMAGE_REL_AMD64_ADDR64 = 0x0001; // The 64-bit VA of the relocation target. 
 constexpr UCHAR IMAGE_REL_AMD64_ADDR32 = 0x0002; // The 32-bit VA of the relocation target. 
 constexpr UCHAR IMAGE_REL_AMD64_ADDR32NB = 0x0003; // The 32 - bit address without an image base(RVA).
-constexpr UCHAR IMAGE_REL_AMD64_REL32 = 0x0004; // The 32-bit relative address from the UCHAR following the relocation. 
-constexpr UCHAR IMAGE_REL_AMD64_REL32_1 = 0x0005; // The 32-bit address relative to UCHAR distance 1 from the relocation. 
-constexpr UCHAR IMAGE_REL_AMD64_REL32_2 = 0x0006; // The 32 - bit address relative to UCHAR distance 2 from the relocation.
-constexpr UCHAR IMAGE_REL_AMD64_REL32_3 = 0x0007; // The 32 - bit address relative to UCHAR distance 3 from the relocation.
-constexpr UCHAR IMAGE_REL_AMD64_REL32_4 = 0x0008; // The 32 - bit address relative to UCHAR distance 4 from the relocation.
-constexpr UCHAR IMAGE_REL_AMD64_REL32_5 = 0x0009; // The 32 - bit address relative to UCHAR distance 5 from the relocation.
+constexpr UCHAR IMAGE_REL_AMD64_REL32 = 0x0004; // The 32-bit relative address from the byte following the relocation. 
+constexpr UCHAR IMAGE_REL_AMD64_REL32_1 = 0x0005; // The 32-bit address relative to byte distance 1 from the relocation. 
+constexpr UCHAR IMAGE_REL_AMD64_REL32_2 = 0x0006; // The 32 - bit address relative to byte distance 2 from the relocation.
+constexpr UCHAR IMAGE_REL_AMD64_REL32_3 = 0x0007; // The 32 - bit address relative to byte distance 3 from the relocation.
+constexpr UCHAR IMAGE_REL_AMD64_REL32_4 = 0x0008; // The 32 - bit address relative to byte distance 4 from the relocation.
+constexpr UCHAR IMAGE_REL_AMD64_REL32_5 = 0x0009; // The 32 - bit address relative to byte distance 5 from the relocation.
 constexpr UCHAR IMAGE_REL_AMD64_SECTION = 0x000A; // The 16-bit section index of the section that contains the target. This is used to support debugging information. 
 constexpr UCHAR IMAGE_REL_AMD64_SECREL = 0x000B; // The 32-bit offset of the target from the beginning of its section. This is used to support debugging information and static thread local storage. 
 constexpr UCHAR IMAGE_REL_AMD64_SECREL7 = 0x000C; // A 7-bit unsigned offset from the base of the section that contains the target. 
@@ -339,6 +339,56 @@ constexpr UCHAR IMAGE_REL_ARM_PAIR = 0x0016;
 constexpr UCHAR IMAGE_REL_ARM64_ABSOLUTE = 0x0000;
 constexpr UCHAR IMAGE_REL_ARM64_ADDR32 = 0x0001;
 constexpr UCHAR IMAGE_REL_ARM64_ADDR32NB = 0x0002;
+constexpr UCHAR IMAGE_REL_ARM64_BRANCH26 = 0x0003; // The 26 - bit relative displacement to the target, for B and BL instructions.
+constexpr UCHAR IMAGE_REL_ARM64_PAGEBASE_REL21 = 0x0004; // The page base of the target, for ADRP instruction. 
+constexpr UCHAR IMAGE_REL_ARM64_REL21 = 0x0005; // The 12 - bit relative displacement to the target, for instruction ADR
+constexpr UCHAR IMAGE_REL_ARM64_PAGEOFFSET_12A = 0x0006; // The 12 - bit page offset of the target, for instructions ADD / ADDS(immediate) with zero shift.
+constexpr UCHAR IMAGE_REL_ARM64_PAGEOFFSET_12L = 0x0007; // The 12-bit page offset of the target, for instruction LDR (indexed, unsigned immediate). 
+constexpr UCHAR IMAGE_REL_ARM64_SECREL = 0x0008; // The 32-bit offset of the target from the beginning of its section. This is used to support debugging information and static thread local storage. 
+constexpr UCHAR IMAGE_REL_ARM64_SECREL_LOW12A = 0x0009; // Bit 0:11 of section offset of the target, for instructions ADD / ADDS(immediate) with zero shift.
+constexpr UCHAR IMAGE_REL_ARM64_SECREL_HIGH12A = 0x000A; // Bit 12:23 of section offset of the target, for instructions ADD/ADDS (immediate) with zero shift. 
+constexpr UCHAR IMAGE_REL_ARM64_SECREL_LOW12L = 0x000B; // Bit 0:11 of section offset of the target, for instruction LDR (indexed, unsigned immediate). 
+constexpr UCHAR IMAGE_REL_ARM64_TOKEN = 0x000C; // CLR token. 
+constexpr UCHAR IMAGE_REL_ARM64_SECTION = 0x000D; // The 16-bit section index of the section that contains the target. This is used to support debugging information. 
+constexpr UCHAR IMAGE_REL_ARM64_ADDR64 = 0x000E; // The 64-bit VA of the relocation target. 
+constexpr UCHAR IMAGE_REL_ARM64_BRANCH19 = 0x000F; // The 19-bit offset to the relocation target, for conditional B instruction. 
+constexpr UCHAR IMAGE_REL_ARM64_BRANCH14 = 0x0010; // The 14-bit offset to the relocation target, for instructions TBZ and TBNZ. 
+constexpr UCHAR IMAGE_REL_ARM64_REL32 = 0x0011; // The 32 - bit relative address from the byte following the relocation.
+
+
+// Hitachi SuperH Processors. The following relocation type indicators are defined for SH3 and SH4 processors. SH5-specific relocations are noted as SHM (SH Media).
+constexpr UCHAR IMAGE_REL_SH3_ABSOLUTE = 0x0000; // The relocation is ignored.
+constexpr UCHAR IMAGE_REL_SH3_DIRECT16 = 0x0001; // A reference to the 16 - bit location that contains the VA of the target symbol.
+constexpr UCHAR IMAGE_REL_SH3_DIRECT32 = 0x0002; // The 32 - bit VA of the target symbol.
+constexpr UCHAR IMAGE_REL_SH3_DIRECT8 = 0x0003; // A reference to the 8 - bit location that contains the VA of the target symbol.
+constexpr UCHAR IMAGE_REL_SH3_DIRECT8_WORD = 0x0004; // A reference to the 8 - bit instruction that contains the effective 16 - bit VA of the target symbol.
+constexpr UCHAR IMAGE_REL_SH3_DIRECT8_LONG = 0x0005; // A reference to the 8 - bit instruction that contains the effective 32 - bit VA of the target symbol.
+constexpr UCHAR IMAGE_REL_SH3_DIRECT4 = 0x0006; // A reference to the 8 - bit location whose low 4 bits contain the VA of the target symbol.
+constexpr UCHAR IMAGE_REL_SH3_DIRECT4_WORD = 0x0007; // A reference to the 8 - bit instruction whose low 4 bits contain the effective 16 - bit VA of the target symbol.
+constexpr UCHAR IMAGE_REL_SH3_DIRECT4_LONG = 0x0008; // A reference to the 8 - bit instruction whose low 4 bits contain the effective 32 - bit VA of the target symbol.
+constexpr UCHAR IMAGE_REL_SH3_PCREL8_WORD = 0x0009; // A reference to the 8 - bit instruction that contains the effective 16 - bit relative offset of the target symbol.
+constexpr UCHAR IMAGE_REL_SH3_PCREL8_LONG = 0x000A; // A reference to the 8 - bit instruction that contains the effective 32 - bit relative offset of the target symbol.
+constexpr UCHAR IMAGE_REL_SH3_PCREL12_WORD = 0x000B; // A reference to the 16 - bit instruction whose low 12 bits contain the effective 16 - bit relative offset of the target symbol.
+constexpr UCHAR IMAGE_REL_SH3_STARTOF_SECTION = 0x000C; // A reference to a 32 - bit location that is the VA of the section that contains the target symbol.
+constexpr UCHAR IMAGE_REL_SH3_SIZEOF_SECTION = 0x000D; // A reference to the 32 - bit location that is the size of the section that contains the target symbol.
+constexpr UCHAR IMAGE_REL_SH3_SECTION = 0x000E; // The 16 - bit section index of the section that contains the target.This is used to support debugging information.
+constexpr UCHAR IMAGE_REL_SH3_SECREL = 0x000F; // The 32 - bit offset of the target from the beginning of its section.This is used to support debugging information and static thread local storage.
+constexpr UCHAR IMAGE_REL_SH3_DIRECT32_NB = 0x0010; // The 32 - bit RVA of the target symbol.
+constexpr UCHAR IMAGE_REL_SH3_GPREL4_LONG = 0x0011; // GP relative.
+constexpr UCHAR IMAGE_REL_SH3_TOKEN = 0x0012; // CLR token.
+constexpr UCHAR IMAGE_REL_SHM_PCRELPT = 0x0013; // The offset from the current instruction in longwords.If the NOMODE bit is not set, insert the inverse of the low bit at bit 32 to select PTA or PTB.
+constexpr UCHAR IMAGE_REL_SHM_REFLO = 0x0014; // The low 16 bits of the 32 - bit address.
+constexpr UCHAR IMAGE_REL_SHM_REFHALF = 0x0015; // The high 16 bits of the 32 - bit address.
+constexpr UCHAR IMAGE_REL_SHM_RELLO = 0x0016; // The low 16 bits of the relative address.
+constexpr UCHAR IMAGE_REL_SHM_RELHALF = 0x0017; // The high 16 bits of the relative address.
+constexpr UCHAR IMAGE_REL_SHM_PAIR = 0x0018; // The relocation is valid only when it immediately follows a REFHALF, RELHALF, or RELLO relocation.The SymbolTableIndex field of the relocation contains a displacement and not an index into the symbol table.
+constexpr USHORT IMAGE_REL_SHM_NOMODE = 0x8000; // The relocation ignores section mode.
+
+
+// IBM PowerPC Processors. The following relocation type indicators are defined for PowerPC processors.
+
+
+
 // this class describes Portable executable format
 class PE
 {
