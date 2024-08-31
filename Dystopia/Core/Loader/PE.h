@@ -386,7 +386,48 @@ constexpr USHORT IMAGE_REL_SHM_NOMODE = 0x8000; // The relocation ignores sectio
 
 
 // IBM PowerPC Processors. The following relocation type indicators are defined for PowerPC processors.
+constexpr UCHAR IMAGE_REL_PPC_ABSOLUTE = 0x0000; // The relocation is ignored.
+constexpr UCHAR IMAGE_REL_PPC_ADDR64 = 0x0001; // The 64-bit VA of the target. 
+constexpr UCHAR IMAGE_REL_PPC_ADDR32 = 0x0002; // The 32 - bit VA of the target.
+constexpr UCHAR IMAGE_REL_PPC_ADDR24 = 0x0003; // The low 24 bits of the VA of the target.This is valid only when the target symbol is absolute and can be sign - extended to its original value.
+constexpr UCHAR IMAGE_REL_PPC_ADDR16 = 0x0004; // The low 16 bits of the target's VA. 
+constexpr UCHAR IMAGE_REL_PPC_REL24 = 0x0006; // A 24 - bit PC - relative offset to the symbol's location. 
+constexpr UCHAR IMAGE_REL_PPC_REL14 = 0x0007; // A 14 - bit PC - relative offset to the symbol's location. 
+constexpr UCHAR IMAGE_REL_PPC_ADDR32NB = 0x000A; // The 32 - bit RVA of the target.
+constexpr UCHAR IMAGE_REL_PPC_SECREL = 0x000B; // The 32 - bit offset of the target from the beginning of its section.This is used to support debugging information and static thread local storage.
+constexpr UCHAR IMAGE_REL_PPC_SECTION = 0x000C; // The 16 - bit section index of the section that contains the target.This is used to support debugging information.
+constexpr UCHAR IMAGE_REL_PPC_SECREL16 = 0x000F; // The 16 - bit offset of the target from the beginning of its section.This is used to support debugging information and static thread local storage.
+constexpr UCHAR IMAGE_REL_PPC_REFHI = 0x0010; // The high 16 bits of the target's 32-bit VA.
+constexpr UCHAR IMAGE_REL_PPC_REFLO = 0x0011; // The low 16 bits of the target's VA. 
+constexpr UCHAR IMAGE_REL_PPC_PAIR = 0x0012; // A relocation that is valid only when it immediately follows a REFHI or SECRELHI relocation.Its SymbolTableIndex contains a displacement and not an index into the symbol table.
+constexpr UCHAR IMAGE_REL_PPC_SECRELLO = 0x0013; // The low 16 bits of the 32 - bit offset of the target from the beginning of its section.
+constexpr UCHAR IMAGE_REL_PPC_GPREL = 0x0015; // The 16 - bit signed displacement of the target relative to the GP register.
+constexpr UCHAR IMAGE_REL_PPC_TOKEN = 0x0016; // The CLR token.
 
+
+// Intel 386 Processors. The following relocation type indicators are defined for Intel 386 and compatible processors.
+constexpr UCHAR IMAGE_REL_I386_ABSOLUTE = 0x0000; // The relocation is ignored.
+constexpr UCHAR IMAGE_REL_I386_DIR16 = 0x0001; // Not supported.
+constexpr UCHAR IMAGE_REL_I386_REL16 = 0x0002; // Not supported.
+constexpr UCHAR IMAGE_REL_I386_DIR32 = 0x0006; // The target's 32-bit VA. 
+constexpr UCHAR IMAGE_REL_I386_DIR32NB = 0x0007; // The target's 32-bit RVA. 
+constexpr UCHAR IMAGE_REL_I386_SEG12 = 0x0009; // Not supported.
+constexpr UCHAR IMAGE_REL_I386_SECTION = 0x000A; // The 16 - bit section index of the section that contains the target.This is used to support debugging information.
+constexpr UCHAR IMAGE_REL_I386_SECREL = 0x000B; // The 32 - bit offset of the target from the beginning of its section.This is used to support debugging information and static thread local storage.
+constexpr UCHAR IMAGE_REL_I386_TOKEN = 0x000C; // The CLR token.
+constexpr UCHAR IMAGE_REL_I386_SECREL7 = 0x000D; // A 7 - bit offset from the base of the section that contains the target.
+constexpr UCHAR IMAGE_REL_I386_REL32 = 0x0014; // The 32 - bit relative displacement to the target.This supports the x86 relative branch and call instructions.
+
+
+// Intel Itanium Processor Family (IPF)
+// The following relocation type indicators are defined for the Intel Itanium processor family and compatible processors. 
+// Note that relocations on instructions use the bundle's offset and slot number for the relocation offset.
+constexpr UCHAR IMAGE_REL_IA64_ABSOLUTE = 0x0000; // The relocation is ignored.
+constexpr UCHAR IMAGE_REL_IA64_IMM14 = 0x0001; // The instruction relocation can be followed by an ADDEND relocation whose value is added to the target address before it is inserted into the specified slot in the IMM14 bundle.The relocation target must be absolute or the image must be fixed.
+constexpr UCHAR IMAGE_REL_IA64_IMM22 = 0x0002; // The instruction relocation can be followed by an ADDEND relocation whose value is added to the target address before it is inserted into the specified slot in the IMM22 bundle.The relocation target must be absolute or the image must be fixed.
+constexpr UCHAR IMAGE_REL_IA64_IMM64 = 0x0003; // The slot number of this relocation must be one(1).The relocation can be followed by an ADDEND relocation whose value is added to the target address before it is stored in all three slots of the IMM64 bundle.
+constexpr UCHAR IMAGE_REL_IA64_DIR32 = 0x0004; // The target's 32-bit VA. This is supported only for /LARGEADDRESSAWARE:NO images. 
+constexpr UCHAR IMAGE_REL_IA64_DIR64 = 0x0005; // The target's 64-bit VA. 
 
 
 // this class describes Portable executable format
