@@ -428,7 +428,7 @@ constexpr UCHAR IMAGE_REL_IA64_IMM22 = 0x0002; // The instruction relocation can
 constexpr UCHAR IMAGE_REL_IA64_IMM64 = 0x0003; // The slot number of this relocation must be one(1).The relocation can be followed by an ADDEND relocation whose value is added to the target address before it is stored in all three slots of the IMM64 bundle.
 constexpr UCHAR IMAGE_REL_IA64_DIR32 = 0x0004; // The target's 32-bit VA. This is supported only for /LARGEADDRESSAWARE:NO images. 
 constexpr UCHAR IMAGE_REL_IA64_DIR64 = 0x0005; // The target's 64-bit VA. 
-
+constexpr UCHAR IMAGE_REL_IA64_PCREL21B = 0x0006; // The instruction is fixed up with the 25 - bit relative displacement to the 16 - bit aligned target.The low 4 bits of the displacement are zero and are not stored.
 
 // this class describes Portable executable format
 class PE
