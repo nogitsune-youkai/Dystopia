@@ -429,7 +429,7 @@ constexpr UCHAR IMAGE_REL_IA64_IMM64 = 0x0003; // The slot number of this reloca
 constexpr UCHAR IMAGE_REL_IA64_DIR32 = 0x0004; // The target's 32-bit VA. This is supported only for /LARGEADDRESSAWARE:NO images. 
 constexpr UCHAR IMAGE_REL_IA64_DIR64 = 0x0005; // The target's 64-bit VA. 
 constexpr UCHAR IMAGE_REL_IA64_PCREL21B = 0x0006; // The instruction is fixed up with the 25 - bit relative displacement to the 16 - bit aligned target.The low 4 bits of the displacement are zero and are not stored.
-
+constexpr UCHAR IMAGE_REL_IA64_PCREL21M = 0x0007; // The instruction is fixed up with the 25 - bit relative displacement to the 16 - bit aligned target.The low 4 bits of the displacement, which are zero, are not stored.
 // this class describes Portable executable format
 class PE
 {
