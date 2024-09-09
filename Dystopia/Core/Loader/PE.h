@@ -471,6 +471,22 @@ constexpr UCHAR IMAGE_REL_MIPS_REFWORDNB = 0x0022; // The target's 32-bit RVA.
 constexpr UCHAR IMAGE_REL_MIPS_PAIR = 0x0025; // The relocation is valid only when it immediately follows a REFHI or SECRELHI relocation.Its SymbolTableIndex contains a displacement and not an index into the symbol table.
 
 
+// Mitsubishi M32R. The following relocation type indicators are defined for the Mitsubishi M32R processors.
+constexpr UCHAR IMAGE_REL_M32R_ABSOLUTE = 0x0000; // The relocation is ignored.
+constexpr UCHAR IMAGE_REL_M32R_ADDR32 = 0x0001; // The target's 32-bit VA. 
+constexpr UCHAR IMAGE_REL_M32R_ADDR32NB = 0x0002; // The target's 32-bit RVA. 
+constexpr UCHAR IMAGE_REL_M32R_ADDR24 = 0x0003; // The target's 24-bit VA. 
+constexpr UCHAR IMAGE_REL_M32R_GPREL16 = 0x0004; // The target's 16-bit offset from the GP register. 
+constexpr UCHAR IMAGE_REL_M32R_PCREL24 = 0x0005; // The target's 24-bit offset from the program counter (PC), shifted left by 2 bits and sign-extended 
+constexpr UCHAR IMAGE_REL_M32R_PCREL16 = 0x0006; // The target's 16-bit offset from the PC, shifted left by 2 bits and sign-extended 
+constexpr UCHAR IMAGE_REL_M32R_PCREL8 = 0x0007; // The target's 8-bit offset from the PC, shifted left by 2 bits and sign-extended 
+constexpr UCHAR IMAGE_REL_M32R_REFHALF = 0x0008; // The 16 MSBs of the target VA.
+constexpr UCHAR IMAGE_REL_M32R_REFHI = 0x0009; // The 16 MSBs of the target VA, adjusted for LSB sign extension.This is used for the first instruction in a two - instruction sequence that loads a full 32 - bit address.
+constexpr UCHAR IMAGE_REL_M32R_REFLO = 0x000A; // The 16 LSBs of the target VA.
+constexpr UCHAR IMAGE_REL_M32R_PAIR = 0x000B; // The relocation must follow the REFHI relocation.Its SymbolTableIndex contains a displacement and not an index into the symbol table.
+constexpr UCHAR IMAGE_REL_M32R_SECTION = 0x000C; // The 16 - bit section index of the section that contains the target.This is used to support debugging information.
+constexpr UCHAR IMAGE_REL_M32R_SECREL = 0x000D; // The 32 - bit offset of the target from the beginning of its section.This is used to support debugging information and static thread local storage.
+constexpr UCHAR IMAGE_REL_M32R_TOKEN = 0x000E; // The CLR token.
 // this class describes Portable executable format
 class PE
 {
