@@ -41,7 +41,7 @@ constexpr UCHAR PEMagic6 = '0';
 
 constexpr ULONG IMAGE_NT_SIGNATURE = 0x4550; // Magic USHORT to define file type - 0x00004550
 
-struct PEHeader {
+struct IMAGE_FILE_HEADER {
 	USHORT Machine; // The number that identifies the type of target machine.
 	USHORT NumberOfSections; // The number of sections. This indicates the size of the section table, as of 2024 this number in Windows is limited to 96
 	ULONG TimeDateStamp; // indicates when the file was created
@@ -487,6 +487,17 @@ constexpr UCHAR IMAGE_REL_M32R_PAIR = 0x000B; // The relocation must follow the 
 constexpr UCHAR IMAGE_REL_M32R_SECTION = 0x000C; // The 16 - bit section index of the section that contains the target.This is used to support debugging information.
 constexpr UCHAR IMAGE_REL_M32R_SECREL = 0x000D; // The 32 - bit offset of the target from the beginning of its section.This is used to support debugging information and static thread local storage.
 constexpr UCHAR IMAGE_REL_M32R_TOKEN = 0x000E; // The CLR token.
+
+struct DelayLoadDirectoryTable {
+	ULONG Attributes; // Must be zero
+	ULONG Name; // The RVA of the name of the DLL to be loaded. The name resides in the read-only data section of the image. 
+	ULONG ModuleHandle; // The RVA of the module handle (in the data section of the image) of the DLL to be delay-loaded. It is used for storage by the routine that is supplied to manage delay-loading. 
+	ULONG DelayImportAddressTable; // The RVA of the delay - load import address table.
+	ULONG DelayImportNameTable; // The RVA of the delay-load name table, which contains the names of the imports that might need to be loaded. This matches the layout of the import name table.
+	ULONG BoundDelayImportTable; // The RVA of the bound delay-load address table, if it exists. 
+	ULONG UnloadDelayImportTable; // The RVA of the unload delay-load address table, if it exists. This is an exact copy of the delay import address table. If the caller unloads the DLL, this table should be copied back over the delay import address table so that subsequent calls to the DLL continue to use the thunking mechanism correctly. 
+	ULONG TimeStamp; // The timestamp of the DLL to which this image has been bound.
+};
 // this class describes Portable executable format
 class PE
 {
