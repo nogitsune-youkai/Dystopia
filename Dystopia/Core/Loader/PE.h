@@ -490,13 +490,26 @@ constexpr UCHAR IMAGE_REL_M32R_TOKEN = 0x000E; // The CLR token.
 
 struct DelayLoadDirectoryTable {
 	ULONG Attributes; // Must be zero
-	ULONG Name; // The RVA of the name of the DLL to be loaded. The name resides in the read-only data section of the image. 
+	ULONG Name; // The RVA of the name of the DLL to be loaded. The name resides in the read-only data section of the image. It is referenced through the szName field.
 	ULONG ModuleHandle; // The RVA of the module handle (in the data section of the image) of the DLL to be delay-loaded. It is used for storage by the routine that is supplied to manage delay-loading. 
 	ULONG DelayImportAddressTable; // The RVA of the delay - load import address table.
 	ULONG DelayImportNameTable; // The RVA of the delay-load name table, which contains the names of the imports that might need to be loaded. This matches the layout of the import name table.
 	ULONG BoundDelayImportTable; // The RVA of the bound delay-load address table, if it exists. 
 	ULONG UnloadDelayImportTable; // The RVA of the unload delay-load address table, if it exists. This is an exact copy of the delay import address table. If the caller unloads the DLL, this table should be copied back over the delay import address table so that subsequent calls to the DLL continue to use the thunking mechanism correctly. 
 	ULONG TimeStamp; // The timestamp of the DLL to which this image has been bound.
+};
+
+//0x1c bytes (sizeof)
+struct IMAGE_DEBUG_DIRECTORY
+{
+	ULONG Characteristics;                                                  
+	ULONG TimeDateStamp;  // The time and date that the debug data was created.                                                 
+	USHORT MajorVersion;  // The major version number of the debug data format.
+	USHORT MinorVersion;  // The minor version number of the debug data format.                                                 
+	ULONG Type;           // The format of debugging information.This field enables support of multiple debuggers.For more information, see Debug Type.
+	ULONG SizeOfData;     // The size of the debug data (not including the debug directory itself).                                                   
+	ULONG AddressOfRawData;  // The address of the debug data when loaded, relative to the image base.                                                
+	ULONG PointerToRawData;  // The file pointer to the debug data.                                                
 };
 // this class describes Portable executable format
 class PE
