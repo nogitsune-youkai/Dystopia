@@ -526,7 +526,7 @@ constexpr UCHAR IMAGE_DEBUG_TYPE_BORLAND = 0x9;
 constexpr UCHAR IMAGE_DEBUG_TYPE_RESERVED10 = 0x10;
 constexpr UCHAR IMAGE_DEBUG_TYPE_CLSID = 0x11;
 constexpr UCHAR IMAGE_DEBUG_TYPE_REPRO = 0x16; // PE determinism or reproducibility. 
-constexpr UCHAR Undefined = 0x17 & 0x19;
+constexpr UCHAR Undefined = 0x17 | 0x19;
 constexpr UCHAR IMAGE_DEBUG_TYPE_EX_DLLCHARACTERISTICS = 0x20; // Extended DLL characteristics bits.
 // this class describes Portable executable format
 class PE
