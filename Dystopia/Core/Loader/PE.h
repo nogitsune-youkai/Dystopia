@@ -511,6 +511,23 @@ struct IMAGE_DEBUG_DIRECTORY
 	ULONG AddressOfRawData;  // The address of the debug data when loaded, relative to the image base.                                                
 	ULONG PointerToRawData;  // The file pointer to the debug data.                                                
 };
+
+// Debug type
+constexpr UCHAR IMAGE_DEBUG_TYPE_UNKNOWN = 0x0; // An unknown value that is ignored by all tools.
+constexpr UCHAR IMAGE_DEBUG_TYPE_COFF = 0x1; // The COFF debug information(line numbers, symbol table, and string table).This type of debug information is also pointed to by fields in the file headers.
+constexpr UCHAR IMAGE_DEBUG_TYPE_CODEVIEW = 0x2; // The Visual C++ debug information.
+constexpr UCHAR IMAGE_DEBUG_TYPE_FPO = 0x3; // The frame pointer omission(FPO) information.This information tells the debugger how to interpret nonstandard stack frames, which use the EBP register for a purpose other than as a frame pointer.
+constexpr UCHAR IMAGE_DEBUG_TYPE_MISC = 0x4; // The location of DBG file. 
+constexpr UCHAR IMAGE_DEBUG_TYPE_EXCEPTION = 0x5; // A copy of.pdata section.
+constexpr UCHAR IMAGE_DEBUG_TYPE_FIXUP = 0x6; // Reserved. 
+constexpr UCHAR IMAGE_DEBUG_TYPE_OMAP_TO_SRC = 0x7; // The mapping from an RVA in image to an RVA in source image. 
+constexpr UCHAR IMAGE_DEBUG_TYPE_OMAP_FROM_SRC = 0x8; // The mapping from an RVA in source image to an RVA in image. 
+constexpr UCHAR IMAGE_DEBUG_TYPE_BORLAND = 0x9; 
+constexpr UCHAR IMAGE_DEBUG_TYPE_RESERVED10 = 0x10;
+constexpr UCHAR IMAGE_DEBUG_TYPE_CLSID = 0x11;
+constexpr UCHAR IMAGE_DEBUG_TYPE_REPRO = 0x16; // PE determinism or reproducibility. 
+constexpr UCHAR Undefined = 0x17 & 0x19;
+constexpr UCHAR IMAGE_DEBUG_TYPE_EX_DLLCHARACTERISTICS = 0x20; // Extended DLL characteristics bits.
 // this class describes Portable executable format
 class PE
 {
