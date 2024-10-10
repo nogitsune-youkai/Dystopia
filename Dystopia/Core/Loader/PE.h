@@ -107,6 +107,22 @@ constexpr USHORT IMAGE_NT_OPTIONAL_HDR32_MAGIC = 0x10B; // normal 32 bit exe
 constexpr USHORT IMAGE_NT_OPTIONAL_HDR64_MAGIC = 0x20B; // 64 bit exe
 constexpr USHORT IMAGE_ROM_OPTIONAL_HDR_MAGIC = 0x107; // ROM image
 
+constexpr UCHAR IMAGE_DIRECTORY_ENTRY_EXPORT = 0;   // Export Directory
+constexpr UCHAR IMAGE_DIRECTORY_ENTRY_IMPORT = 1;   // Import Directory
+constexpr UCHAR IMAGE_DIRECTORY_ENTRY_RESOURCE = 2;   // Resource Directory
+constexpr UCHAR IMAGE_DIRECTORY_ENTRY_EXCEPTION = 3;   // Exception Directory
+constexpr UCHAR IMAGE_DIRECTORY_ENTRY_SECURITY = 4;   // Security Directory
+constexpr UCHAR IMAGE_DIRECTORY_ENTRY_BASERELOC = 5;   // Base Relocation Table
+constexpr UCHAR IMAGE_DIRECTORY_ENTRY_DEBUG = 6;   // Debug Directory
+//      IMAGE_DIRECTORY_ENTRY_COPYRIGHT       7   // (X86 usage)
+constexpr UCHAR IMAGE_DIRECTORY_ENTRY_ARCHITECTURE = 7;   // Architecture Specific Data
+constexpr UCHAR IMAGE_DIRECTORY_ENTRY_GLOBALPTR = 8;   // RVA of GP
+constexpr UCHAR IMAGE_DIRECTORY_ENTRY_TLS = 9;   // TLS Directory
+constexpr UCHAR IMAGE_DIRECTORY_ENTRY_LOAD_CONFIG = 10;   // Load Configuration Directory
+constexpr UCHAR IMAGE_DIRECTORY_ENTRY_BOUND_IMPORT = 11;   // Bound Import Directory in headers
+constexpr UCHAR IMAGE_DIRECTORY_ENTRY_IAT = 12;   // Import Address Table
+constexpr UCHAR IMAGE_DIRECTORY_ENTRY_DELAY_IMPORT   = 13;   // Delay Load Import Descriptors
+constexpr UCHAR IMAGE_DIRECTORY_ENTRY_COM_DESCRIPTOR = 14;   // COM Runtime descriptor
 
 typedef struct _IMAGE_DATA_DIRECTORY {
 	ULONG VirtualAddress; // RVA of the table
@@ -147,23 +163,6 @@ struct _IMAGE_OPTIONAL_HEADER64 {
 	IMAGE_DATA_DIRECTORY DataDirectory[IMAGE_NUMBEROF_DIRECTORY_ENTRIES];
 } IMAGE_OPTIONAL_HEADER, * PIMAGE_OPTIONAL_HEADER;
 
-// Data directories
-constexpr UCHAR ExportTable = 0; // The export table address and size. For more information see .edata Section (Image Only). 
-constexpr UCHAR ImportTable = 1; // The import table address and size. For more information, see The .idata Section.
-constexpr UCHAR ResourceTable = 2; // The resource table address and size. For more information, see The .rsrc Section.
-constexpr UCHAR ExceptionTable = 3; // The exception table address and size. For more information, see The .pdata Section. 
-constexpr UCHAR CertificateTable = 4; // The attribute certificate table address and size. For more information, see The Attribute Certificate Table (Image Only). 
-constexpr UCHAR BaseRelocationTable = 5; // The base relocation table address and size. For more information, see The .reloc Section (Image Only).
-constexpr UCHAR Debug = 6; // The debug data starting address and size. For more information, see The .debug Section.
-constexpr UCHAR Architecture = 7; // Reserved, must be 0 
-constexpr UCHAR GlobalPtr = 8; // The RVA of the value to be stored in the global pointer register. The size member of this structure must be set to zero. 
-constexpr UCHAR TLSTable = 9; // The thread local storage (TLS) table address and size. For more information, see The .tls Section.
-constexpr UCHAR LoadConfigTable = 10; // The load configuration table address and size. For more information, see The Load Configuration Structure (Image Only).
-constexpr UCHAR BoundImport = 11; // The bound import table address and size.
-constexpr UCHAR IAT = 12; // The import address table address and size. For more information, see Import Address Table.
-constexpr UCHAR DelayImportDescriptor = 13; // The delay import descriptor address and size. For more information, see Delay-Load Import Tables (Image Only).
-constexpr UCHAR CLRRuntimeHeader = 14; // The CLR runtime header address and size. For more information, see The .cormeta Section (Object Only).
-
 
 struct PE32OptionalHeader64 {
 	// Standard fields
@@ -201,10 +200,25 @@ struct PE32OptionalHeader64 {
 	IMAGE_DATA_DIRECTORY DataDirectory[IMAGE_NUMBEROF_DIRECTORY_ENTRIES];
 } IMAGE_OPTIONAL_HEADER_64, * PIMAGE_OPTIONAL_HEADER_64;
 
+// There should be IMAGE_EXPORT_DIRECTORY
+struct _IMAGE_EXPORT_DIRECTORY {
+	ULONG   Characteristics;
+	ULONG   TimeDateStamp;
+	USHORT    MajorVersion;
+	USHORT    MinorVersion;
+	ULONG   Name;
+	ULONG   Base;
+	ULONG   NumberOfFunctions;
+	ULONG   NumberOfNames;
+	ULONG   AddressOfFunctions;     // RVA from base of image
+	ULONG   AddressOfNames;         // RVA from base of image
+	ULONG   AddressOfNameOrdinals;  // RVA from base of image
+} IMAGE_EXPORT_DIRECTORY, * PIMAGE_EXPORT_DIRECTORY;
+
 constexpr UCHAR IMAGE_SIZEOF_SHORT_NAME = 8;
 
-struct SectionTable {
-	UCHAR NAME[IMAGE_SIZEOF_SHORT_NAME]; // An 8 - byte, null - padded UTF - 8 encoded string.If the string is exactly 8 characters long, there is no terminating null.For longer names, this field contains a slash(/ ) that is followed by an ASCII representation of a decimal number that is an offset into the string table.
+struct IMAGE_SECTION_HEADER {
+	ULONGLONG NAME[IMAGE_SIZEOF_SHORT_NAME]; // An 8 - byte, null - padded UTF - 8 encoded string.If the string is exactly 8 characters long, there is no terminating null.For longer names, this field contains a slash(/ ) that is followed by an ASCII representation of a decimal number that is an offset into the string table.
 	std::variant<PhysicalAddress, VirtualSize> Misc; // VirtualSize - The total size of the section when loaded into memory.If this value is greater than SizeOfRawData, the section is zero - padded.This field is valid only for executable images and should be set to zero for object files.
 	ULONG VirtualAddress; // For executable images, the address of the first byte of the section relative to the image base when the section is loaded into memory. For object files, this field is the address of the first byte before relocation is applied; for simplicity, compilers should set this to zero. Otherwise, it is an arbitrary value that is subtracted from offsets during relocation. 
 	ULONG SizeOfRawData; // The size of the section (for object files) or the size of the initialized data on disk (for image files). For executable images, this must be a multiple of FileAlignment from the optional header. If this is less than VirtualSize, the remainder of the section is zero-filled. Because the SizeOfRawData field is rounded but the VirtualSize field is not, it is possible for SizeOfRawData to be greater than VirtualSize as well. When a section contains only uninitialized data, this field should be zero. 
@@ -488,6 +502,12 @@ constexpr UCHAR IMAGE_REL_M32R_SECTION = 0x000C; // The 16 - bit section index o
 constexpr UCHAR IMAGE_REL_M32R_SECREL = 0x000D; // The 32 - bit offset of the target from the beginning of its section.This is used to support debugging information and static thread local storage.
 constexpr UCHAR IMAGE_REL_M32R_TOKEN = 0x000E; // The CLR token.
 
+struct IMAGE_SYMBOL {
+	ULONGLONG ShortName[IMAGE_SIZEOF_SHORT_NAME]; // An array of 8 bytes. This array is padded with nulls on the right if the name is less than 8 bytes long. 
+	ULONG Zeroes; // A field that is set to all zeros if the name is longer than 8 bytes. 
+	ULONG Offset; // An offset into the string table.
+};
+
 struct DelayLoadDirectoryTable {
 	ULONG Attributes; // Must be zero
 	ULONG Name; // The RVA of the name of the DLL to be loaded. The name resides in the read-only data section of the image. It is referenced through the szName field.
@@ -528,6 +548,10 @@ constexpr UCHAR IMAGE_DEBUG_TYPE_CLSID = 0x11;
 constexpr UCHAR IMAGE_DEBUG_TYPE_REPRO = 0x16; // PE determinism or reproducibility. 
 constexpr UCHAR Undefined = 0x17 | 0x19;
 constexpr UCHAR IMAGE_DEBUG_TYPE_EX_DLLCHARACTERISTICS = 0x20; // Extended DLL characteristics bits.
+
+// Extended DLL Characteristics. The following values are defined for the extended DLL characteristics bits.
+constexpr UCHAR IMAGE_DLLCHARACTERISTICS_EX_CET_COMPAT = 0x0001; // Image is Control-flow Enforcement Technology (CET) Shadow Stack compatible.
+constexpr UCHAR IMAGE_DLLCHARACTERISTICS_EX_FORWARD_CFI_COMPAT = 0x0040; //  	All branch targets in all image code sections are annotated with forward-edge control flow integrity guard instructions such as x86 CET-Indirect Branch Tracking (IBT) or ARM Branch Target Identification (BTI) instructions. This bit is not used by Windows.
 // this class describes Portable executable format
 class PE
 {
