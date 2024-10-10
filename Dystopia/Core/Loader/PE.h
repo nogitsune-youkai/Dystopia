@@ -41,7 +41,7 @@ constexpr UCHAR PEMagic6 = '0';
 
 constexpr ULONG IMAGE_NT_SIGNATURE = 0x4550; // Magic USHORT to define file type - 0x00004550
 
-struct PEHeader {
+struct IMAGE_FILE_HEADER {
 	USHORT Machine; // The number that identifies the type of target machine.
 	USHORT NumberOfSections; // The number of sections. This indicates the size of the section table, as of 2024 this number in Windows is limited to 96
 	ULONG TimeDateStamp; // indicates when the file was created
@@ -107,6 +107,22 @@ constexpr USHORT IMAGE_NT_OPTIONAL_HDR32_MAGIC = 0x10B; // normal 32 bit exe
 constexpr USHORT IMAGE_NT_OPTIONAL_HDR64_MAGIC = 0x20B; // 64 bit exe
 constexpr USHORT IMAGE_ROM_OPTIONAL_HDR_MAGIC = 0x107; // ROM image
 
+constexpr UCHAR IMAGE_DIRECTORY_ENTRY_EXPORT = 0;   // Export Directory
+constexpr UCHAR IMAGE_DIRECTORY_ENTRY_IMPORT = 1;   // Import Directory
+constexpr UCHAR IMAGE_DIRECTORY_ENTRY_RESOURCE = 2;   // Resource Directory
+constexpr UCHAR IMAGE_DIRECTORY_ENTRY_EXCEPTION = 3;   // Exception Directory
+constexpr UCHAR IMAGE_DIRECTORY_ENTRY_SECURITY = 4;   // Security Directory
+constexpr UCHAR IMAGE_DIRECTORY_ENTRY_BASERELOC = 5;   // Base Relocation Table
+constexpr UCHAR IMAGE_DIRECTORY_ENTRY_DEBUG = 6;   // Debug Directory
+//      IMAGE_DIRECTORY_ENTRY_COPYRIGHT       7   // (X86 usage)
+constexpr UCHAR IMAGE_DIRECTORY_ENTRY_ARCHITECTURE = 7;   // Architecture Specific Data
+constexpr UCHAR IMAGE_DIRECTORY_ENTRY_GLOBALPTR = 8;   // RVA of GP
+constexpr UCHAR IMAGE_DIRECTORY_ENTRY_TLS = 9;   // TLS Directory
+constexpr UCHAR IMAGE_DIRECTORY_ENTRY_LOAD_CONFIG = 10;   // Load Configuration Directory
+constexpr UCHAR IMAGE_DIRECTORY_ENTRY_BOUND_IMPORT = 11;   // Bound Import Directory in headers
+constexpr UCHAR IMAGE_DIRECTORY_ENTRY_IAT = 12;   // Import Address Table
+constexpr UCHAR IMAGE_DIRECTORY_ENTRY_DELAY_IMPORT   = 13;   // Delay Load Import Descriptors
+constexpr UCHAR IMAGE_DIRECTORY_ENTRY_COM_DESCRIPTOR = 14;   // COM Runtime descriptor
 
 typedef struct _IMAGE_DATA_DIRECTORY {
 	ULONG VirtualAddress; // RVA of the table
@@ -147,23 +163,6 @@ struct _IMAGE_OPTIONAL_HEADER64 {
 	IMAGE_DATA_DIRECTORY DataDirectory[IMAGE_NUMBEROF_DIRECTORY_ENTRIES];
 } IMAGE_OPTIONAL_HEADER, * PIMAGE_OPTIONAL_HEADER;
 
-// Data directories
-constexpr UCHAR ExportTable = 0; // The export table address and size. For more information see .edata Section (Image Only). 
-constexpr UCHAR ImportTable = 1; // The import table address and size. For more information, see The .idata Section.
-constexpr UCHAR ResourceTable = 2; // The resource table address and size. For more information, see The .rsrc Section.
-constexpr UCHAR ExceptionTable = 3; // The exception table address and size. For more information, see The .pdata Section. 
-constexpr UCHAR CertificateTable = 4; // The attribute certificate table address and size. For more information, see The Attribute Certificate Table (Image Only). 
-constexpr UCHAR BaseRelocationTable = 5; // The base relocation table address and size. For more information, see The .reloc Section (Image Only).
-constexpr UCHAR Debug = 6; // The debug data starting address and size. For more information, see The .debug Section.
-constexpr UCHAR Architecture = 7; // Reserved, must be 0 
-constexpr UCHAR GlobalPtr = 8; // The RVA of the value to be stored in the global pointer register. The size member of this structure must be set to zero. 
-constexpr UCHAR TLSTable = 9; // The thread local storage (TLS) table address and size. For more information, see The .tls Section.
-constexpr UCHAR LoadConfigTable = 10; // The load configuration table address and size. For more information, see The Load Configuration Structure (Image Only).
-constexpr UCHAR BoundImport = 11; // The bound import table address and size.
-constexpr UCHAR IAT = 12; // The import address table address and size. For more information, see Import Address Table.
-constexpr UCHAR DelayImportDescriptor = 13; // The delay import descriptor address and size. For more information, see Delay-Load Import Tables (Image Only).
-constexpr UCHAR CLRRuntimeHeader = 14; // The CLR runtime header address and size. For more information, see The .cormeta Section (Object Only).
-
 
 struct PE32OptionalHeader64 {
 	// Standard fields
@@ -201,10 +200,25 @@ struct PE32OptionalHeader64 {
 	IMAGE_DATA_DIRECTORY DataDirectory[IMAGE_NUMBEROF_DIRECTORY_ENTRIES];
 } IMAGE_OPTIONAL_HEADER_64, * PIMAGE_OPTIONAL_HEADER_64;
 
+// There should be IMAGE_EXPORT_DIRECTORY
+struct _IMAGE_EXPORT_DIRECTORY {
+	ULONG   Characteristics;
+	ULONG   TimeDateStamp;
+	USHORT    MajorVersion;
+	USHORT    MinorVersion;
+	ULONG   Name;
+	ULONG   Base;
+	ULONG   NumberOfFunctions;
+	ULONG   NumberOfNames;
+	ULONG   AddressOfFunctions;     // RVA from base of image
+	ULONG   AddressOfNames;         // RVA from base of image
+	ULONG   AddressOfNameOrdinals;  // RVA from base of image
+} IMAGE_EXPORT_DIRECTORY, * PIMAGE_EXPORT_DIRECTORY;
+
 constexpr UCHAR IMAGE_SIZEOF_SHORT_NAME = 8;
 
-struct SectionTable {
-	UCHAR NAME[IMAGE_SIZEOF_SHORT_NAME]; // An 8 - byte, null - padded UTF - 8 encoded string.If the string is exactly 8 characters long, there is no terminating null.For longer names, this field contains a slash(/ ) that is followed by an ASCII representation of a decimal number that is an offset into the string table.
+struct IMAGE_SECTION_HEADER {
+	ULONGLONG NAME[IMAGE_SIZEOF_SHORT_NAME]; // An 8 - byte, null - padded UTF - 8 encoded string.If the string is exactly 8 characters long, there is no terminating null.For longer names, this field contains a slash(/ ) that is followed by an ASCII representation of a decimal number that is an offset into the string table.
 	std::variant<PhysicalAddress, VirtualSize> Misc; // VirtualSize - The total size of the section when loaded into memory.If this value is greater than SizeOfRawData, the section is zero - padded.This field is valid only for executable images and should be set to zero for object files.
 	ULONG VirtualAddress; // For executable images, the address of the first byte of the section relative to the image base when the section is loaded into memory. For object files, this field is the address of the first byte before relocation is applied; for simplicity, compilers should set this to zero. Otherwise, it is an arbitrary value that is subtracted from offsets during relocation. 
 	ULONG SizeOfRawData; // The size of the section (for object files) or the size of the initialized data on disk (for image files). For executable images, this must be a multiple of FileAlignment from the optional header. If this is less than VirtualSize, the remainder of the section is zero-filled. Because the SizeOfRawData field is rounded but the VirtualSize field is not, it is possible for SizeOfRawData to be greater than VirtualSize as well. When a section contains only uninitialized data, this field should be zero. 
@@ -386,9 +400,158 @@ constexpr USHORT IMAGE_REL_SHM_NOMODE = 0x8000; // The relocation ignores sectio
 
 
 // IBM PowerPC Processors. The following relocation type indicators are defined for PowerPC processors.
+constexpr UCHAR IMAGE_REL_PPC_ABSOLUTE = 0x0000; // The relocation is ignored.
+constexpr UCHAR IMAGE_REL_PPC_ADDR64 = 0x0001; // The 64-bit VA of the target. 
+constexpr UCHAR IMAGE_REL_PPC_ADDR32 = 0x0002; // The 32 - bit VA of the target.
+constexpr UCHAR IMAGE_REL_PPC_ADDR24 = 0x0003; // The low 24 bits of the VA of the target.This is valid only when the target symbol is absolute and can be sign - extended to its original value.
+constexpr UCHAR IMAGE_REL_PPC_ADDR16 = 0x0004; // The low 16 bits of the target's VA. 
+constexpr UCHAR IMAGE_REL_PPC_REL24 = 0x0006; // A 24 - bit PC - relative offset to the symbol's location. 
+constexpr UCHAR IMAGE_REL_PPC_REL14 = 0x0007; // A 14 - bit PC - relative offset to the symbol's location. 
+constexpr UCHAR IMAGE_REL_PPC_ADDR32NB = 0x000A; // The 32 - bit RVA of the target.
+constexpr UCHAR IMAGE_REL_PPC_SECREL = 0x000B; // The 32 - bit offset of the target from the beginning of its section.This is used to support debugging information and static thread local storage.
+constexpr UCHAR IMAGE_REL_PPC_SECTION = 0x000C; // The 16 - bit section index of the section that contains the target.This is used to support debugging information.
+constexpr UCHAR IMAGE_REL_PPC_SECREL16 = 0x000F; // The 16 - bit offset of the target from the beginning of its section.This is used to support debugging information and static thread local storage.
+constexpr UCHAR IMAGE_REL_PPC_REFHI = 0x0010; // The high 16 bits of the target's 32-bit VA.
+constexpr UCHAR IMAGE_REL_PPC_REFLO = 0x0011; // The low 16 bits of the target's VA. 
+constexpr UCHAR IMAGE_REL_PPC_PAIR = 0x0012; // A relocation that is valid only when it immediately follows a REFHI or SECRELHI relocation.Its SymbolTableIndex contains a displacement and not an index into the symbol table.
+constexpr UCHAR IMAGE_REL_PPC_SECRELLO = 0x0013; // The low 16 bits of the 32 - bit offset of the target from the beginning of its section.
+constexpr UCHAR IMAGE_REL_PPC_GPREL = 0x0015; // The 16 - bit signed displacement of the target relative to the GP register.
+constexpr UCHAR IMAGE_REL_PPC_TOKEN = 0x0016; // The CLR token.
 
 
+// Intel 386 Processors. The following relocation type indicators are defined for Intel 386 and compatible processors.
+constexpr UCHAR IMAGE_REL_I386_ABSOLUTE = 0x0000; // The relocation is ignored.
+constexpr UCHAR IMAGE_REL_I386_DIR16 = 0x0001; // Not supported.
+constexpr UCHAR IMAGE_REL_I386_REL16 = 0x0002; // Not supported.
+constexpr UCHAR IMAGE_REL_I386_DIR32 = 0x0006; // The target's 32-bit VA. 
+constexpr UCHAR IMAGE_REL_I386_DIR32NB = 0x0007; // The target's 32-bit RVA. 
+constexpr UCHAR IMAGE_REL_I386_SEG12 = 0x0009; // Not supported.
+constexpr UCHAR IMAGE_REL_I386_SECTION = 0x000A; // The 16 - bit section index of the section that contains the target.This is used to support debugging information.
+constexpr UCHAR IMAGE_REL_I386_SECREL = 0x000B; // The 32 - bit offset of the target from the beginning of its section.This is used to support debugging information and static thread local storage.
+constexpr UCHAR IMAGE_REL_I386_TOKEN = 0x000C; // The CLR token.
+constexpr UCHAR IMAGE_REL_I386_SECREL7 = 0x000D; // A 7 - bit offset from the base of the section that contains the target.
+constexpr UCHAR IMAGE_REL_I386_REL32 = 0x0014; // The 32 - bit relative displacement to the target.This supports the x86 relative branch and call instructions.
 
+
+// Intel Itanium Processor Family (IPF)
+// The following relocation type indicators are defined for the Intel Itanium processor family and compatible processors. 
+// Note that relocations on instructions use the bundle's offset and slot number for the relocation offset.
+constexpr UCHAR IMAGE_REL_IA64_ABSOLUTE = 0x0000; // The relocation is ignored.
+constexpr UCHAR IMAGE_REL_IA64_IMM14 = 0x0001; // The instruction relocation can be followed by an ADDEND relocation whose value is added to the target address before it is inserted into the specified slot in the IMM14 bundle.The relocation target must be absolute or the image must be fixed.
+constexpr UCHAR IMAGE_REL_IA64_IMM22 = 0x0002; // The instruction relocation can be followed by an ADDEND relocation whose value is added to the target address before it is inserted into the specified slot in the IMM22 bundle.The relocation target must be absolute or the image must be fixed.
+constexpr UCHAR IMAGE_REL_IA64_IMM64 = 0x0003; // The slot number of this relocation must be one(1).The relocation can be followed by an ADDEND relocation whose value is added to the target address before it is stored in all three slots of the IMM64 bundle.
+constexpr UCHAR IMAGE_REL_IA64_DIR32 = 0x0004; // The target's 32-bit VA. This is supported only for /LARGEADDRESSAWARE:NO images. 
+constexpr UCHAR IMAGE_REL_IA64_DIR64 = 0x0005; // The target's 64-bit VA. 
+constexpr UCHAR IMAGE_REL_IA64_PCREL21B = 0x0006; // The instruction is fixed up with the 25 - bit relative displacement to the 16 - bit aligned target.The low 4 bits of the displacement are zero and are not stored.
+constexpr UCHAR IMAGE_REL_IA64_PCREL21M = 0x0007; // The instruction is fixed up with the 25 - bit relative displacement to the 16 - bit aligned target.The low 4 bits of the displacement, which are zero, are not stored.
+constexpr UCHAR IMAGE_REL_IA64_PCREL21F = 0x0008; // The LSBs of this relocation's offset must contain the slot number whereas the rest is the bundle address. The bundle is fixed up with the 25-bit relative displacement to the 16-bit aligned target. The low 4 bits of the displacement are zero and are not stored. 
+constexpr UCHAR IMAGE_REL_IA64_GPREL22 = 0x0009; // The instruction relocation can be followed by an ADDEND relocation whose value is added to the target address and then a 22 - bit GP - relative offset that is calculated and applied to the GPREL22 bundle.
+constexpr UCHAR IMAGE_REL_IA64_LTOFF22 = 0x000A; // The instruction is fixed up with the 22 - bit GP - relative offset to the target symbol's literal table entry. The linker creates this literal table entry based on this relocation and the ADDEND relocation that might follow. 
+constexpr UCHAR IMAGE_REL_IA64_SECTION = 0x000B; // The 16 - bit section index of the section contains the target.This is used to support debugging information.
+constexpr UCHAR IMAGE_REL_IA64_SECREL22 = 0x000C; // The instruction is fixed up with the 22 - bit offset of the target from the beginning of its section.This relocation can be followed immediately by an ADDEND relocation, whose Value field contains the 32 - bit unsigned offset of the target from the beginning of the section.
+constexpr UCHAR IMAGE_REL_IA64_SECREL64I = 0x000D; // The slot number for this relocation must be one(1).The instruction is fixed up with the 64 - bit offset of the target from the beginning of its section.
+constexpr UCHAR IMAGE_REL_IA64_SECREL32 = 0x000E; // The address of data to be fixed up with the 32 - bit offset of the target from the beginning of its section.
+constexpr UCHAR IMAGE_REL_IA64_DIR32NB = 0x0010; // The target's 32-bit RVA. 
+constexpr UCHAR IMAGE_REL_IA64_SREL14 = 0x0011; // This is applied to a signed 14 - bit immediate that contains the difference between two relocatable targets.This is a declarative field for the linker that indicates that the compiler has already emitted this value.
+constexpr UCHAR IMAGE_REL_IA64_SREL22 = 0x0012; // This is applied to a signed 22 - bit immediate that contains the difference between two relocatable targets.This is a declarative field for the linker that indicates that the compiler has already emitted this value.
+constexpr UCHAR IMAGE_REL_IA64_SREL32 = 0x0013; // This is applied to a signed 32 - bit immediate that contains the difference between two relocatable values.This is a declarative field for the linker that indicates that the compiler has already emitted this value.
+constexpr UCHAR IMAGE_REL_IA64_UREL32 = 0x0014; // This is applied to an unsigned 32 - bit immediate that contains the difference between two relocatable values.This is a declarative field for the linker that indicates that the compiler has already emitted this value.
+constexpr UCHAR IMAGE_REL_IA64_PCREL60X = 0x0015; // A 60 - bit PC - relative fixup that always stays as a BRL instruction of an MLX bundle.
+constexpr UCHAR IMAGE_REL_IA64_PCREL60B = 0x0016; // A 60 - bit PC - relative fixup.If the target displacement fits in a signed 25 - bit field, convert the entire bundle to an MBB bundle with NOP.B in slot 1 and a 25 - bit BR instruction(with the 4 lowest bits all zero and dropped) in slot 2.
+constexpr UCHAR IMAGE_REL_IA64_PCREL60F = 0x0017; // A 60 - bit PC - relative fixup.If the target displacement fits in a signed 25 - bit field, convert the entire bundle to an MFB bundle with NOP.F in slot 1 and a 25 - bit(4 lowest bits all zero and dropped) BR instruction in slot 2.
+constexpr UCHAR IMAGE_REL_IA64_PCREL60I = 0x0018; // A 60 - bit PC - relative fixup.If the target displacement fits in a signed 25 - bit field, convert the entire bundle to an MIB bundle with NOP.I in slot 1 and a 25 - bit(4 lowest bits all zero and dropped) BR instruction in slot 2.
+constexpr UCHAR IMAGE_REL_IA64_PCREL60M = 0x0019; // A 60 - bit PC - relative fixup.If the target displacement fits in a signed 25 - bit field, convert the entire bundle to an MMB bundle with NOP.M in slot 1 and a 25 - bit(4 lowest bits all zero and dropped) BR instruction in slot 2.
+constexpr UCHAR IMAGE_REL_IA64_IMMGPREL64 = 0x001a; // A 64 - bit GP - relative fixup.
+constexpr UCHAR IMAGE_REL_IA64_TOKEN = 0x001b; // A CLR token.
+constexpr UCHAR IMAGE_REL_IA64_GPREL32 = 0x001c; // A 32 - bit GP - relative fixup.
+constexpr UCHAR IMAGE_REL_IA64_ADDEND = 0x001F; // The relocation is valid only when it immediately follows one of the following relocations : IMM14, IMM22, IMM64, GPREL22, LTOFF22, LTOFF64, SECREL22, SECREL64I, or SECREL32.Its value contains the addend to apply to instructions within a bundle, not for data.
+
+
+// MIPS Processors. The following relocation type indicators are defined for MIPS processors.
+constexpr UCHAR IMAGE_REL_MIPS_ABSOLUTE = 0x0000; // The relocation is ignored.
+constexpr UCHAR IMAGE_REL_MIPS_REFHALF = 0x0001; // The high 16 bits of the target's 32-bit VA. 
+constexpr UCHAR IMAGE_REL_MIPS_REFWORD = 0x0002; // The target's 32-bit VA. 
+constexpr UCHAR IMAGE_REL_MIPS_JMPADDR = 0x0003; // The low 26 bits of the target's VA. This supports the MIPS J and JAL instructions. 
+constexpr UCHAR IMAGE_REL_MIPS_REFHI = 0x0004; // The high 16 bits of the target's 32-bit VA. This is used for the first instruction in a two-instruction sequence that loads a full address.
+constexpr UCHAR IMAGE_REL_MIPS_REFLO = 0x0005; // The low 16 bits of the target's VA. 
+constexpr UCHAR IMAGE_REL_MIPS_GPREL = 0x0006; // A 16 - bit signed displacement of the target relative to the GP register.
+constexpr UCHAR IMAGE_REL_MIPS_LITERAL = 0x0007; // The same as IMAGE_REL_MIPS_GPREL.
+constexpr UCHAR IMAGE_REL_MIPS_SECTION = 0x000A; // The 16 - bit section index of the section contains the target.This is used to support debugging information.
+constexpr UCHAR IMAGE_REL_MIPS_SECREL = 0x000B; // The 32 - bit offset of the target from the beginning of its section.This is used to support debugging information and static thread local storage.
+constexpr UCHAR IMAGE_REL_MIPS_SECRELLO = 0x000C; // The low 16 bits of the 32 - bit offset of the target from the beginning of its section.
+constexpr UCHAR IMAGE_REL_MIPS_SECRELHI = 0x000D; // The high 16 bits of the 32 - bit offset of the target from the beginning of its section.An IMAGE_REL_MIPS_PAIR relocation must immediately follow this one.
+constexpr UCHAR IMAGE_REL_MIPS_JMPADDR16 = 0x0010; // The low 26 bits of the target's VA. This supports the MIPS16 JAL instruction. 
+constexpr UCHAR IMAGE_REL_MIPS_REFWORDNB = 0x0022; // The target's 32-bit RVA. 
+constexpr UCHAR IMAGE_REL_MIPS_PAIR = 0x0025; // The relocation is valid only when it immediately follows a REFHI or SECRELHI relocation.Its SymbolTableIndex contains a displacement and not an index into the symbol table.
+
+
+// Mitsubishi M32R. The following relocation type indicators are defined for the Mitsubishi M32R processors.
+constexpr UCHAR IMAGE_REL_M32R_ABSOLUTE = 0x0000; // The relocation is ignored.
+constexpr UCHAR IMAGE_REL_M32R_ADDR32 = 0x0001; // The target's 32-bit VA. 
+constexpr UCHAR IMAGE_REL_M32R_ADDR32NB = 0x0002; // The target's 32-bit RVA. 
+constexpr UCHAR IMAGE_REL_M32R_ADDR24 = 0x0003; // The target's 24-bit VA. 
+constexpr UCHAR IMAGE_REL_M32R_GPREL16 = 0x0004; // The target's 16-bit offset from the GP register. 
+constexpr UCHAR IMAGE_REL_M32R_PCREL24 = 0x0005; // The target's 24-bit offset from the program counter (PC), shifted left by 2 bits and sign-extended 
+constexpr UCHAR IMAGE_REL_M32R_PCREL16 = 0x0006; // The target's 16-bit offset from the PC, shifted left by 2 bits and sign-extended 
+constexpr UCHAR IMAGE_REL_M32R_PCREL8 = 0x0007; // The target's 8-bit offset from the PC, shifted left by 2 bits and sign-extended 
+constexpr UCHAR IMAGE_REL_M32R_REFHALF = 0x0008; // The 16 MSBs of the target VA.
+constexpr UCHAR IMAGE_REL_M32R_REFHI = 0x0009; // The 16 MSBs of the target VA, adjusted for LSB sign extension.This is used for the first instruction in a two - instruction sequence that loads a full 32 - bit address.
+constexpr UCHAR IMAGE_REL_M32R_REFLO = 0x000A; // The 16 LSBs of the target VA.
+constexpr UCHAR IMAGE_REL_M32R_PAIR = 0x000B; // The relocation must follow the REFHI relocation.Its SymbolTableIndex contains a displacement and not an index into the symbol table.
+constexpr UCHAR IMAGE_REL_M32R_SECTION = 0x000C; // The 16 - bit section index of the section that contains the target.This is used to support debugging information.
+constexpr UCHAR IMAGE_REL_M32R_SECREL = 0x000D; // The 32 - bit offset of the target from the beginning of its section.This is used to support debugging information and static thread local storage.
+constexpr UCHAR IMAGE_REL_M32R_TOKEN = 0x000E; // The CLR token.
+
+struct IMAGE_SYMBOL {
+	ULONGLONG ShortName[IMAGE_SIZEOF_SHORT_NAME]; // An array of 8 bytes. This array is padded with nulls on the right if the name is less than 8 bytes long. 
+	ULONG Zeroes; // A field that is set to all zeros if the name is longer than 8 bytes. 
+	ULONG Offset; // An offset into the string table.
+};
+
+struct DelayLoadDirectoryTable {
+	ULONG Attributes; // Must be zero
+	ULONG Name; // The RVA of the name of the DLL to be loaded. The name resides in the read-only data section of the image. It is referenced through the szName field.
+	ULONG ModuleHandle; // The RVA of the module handle (in the data section of the image) of the DLL to be delay-loaded. It is used for storage by the routine that is supplied to manage delay-loading. 
+	ULONG DelayImportAddressTable; // The RVA of the delay - load import address table.
+	ULONG DelayImportNameTable; // The RVA of the delay-load name table, which contains the names of the imports that might need to be loaded. This matches the layout of the import name table.
+	ULONG BoundDelayImportTable; // The RVA of the bound delay-load address table, if it exists. 
+	ULONG UnloadDelayImportTable; // The RVA of the unload delay-load address table, if it exists. This is an exact copy of the delay import address table. If the caller unloads the DLL, this table should be copied back over the delay import address table so that subsequent calls to the DLL continue to use the thunking mechanism correctly. 
+	ULONG TimeStamp; // The timestamp of the DLL to which this image has been bound.
+};
+
+//0x1c bytes (sizeof)
+struct IMAGE_DEBUG_DIRECTORY
+{
+	ULONG Characteristics;                                                  
+	ULONG TimeDateStamp;  // The time and date that the debug data was created.                                                 
+	USHORT MajorVersion;  // The major version number of the debug data format.
+	USHORT MinorVersion;  // The minor version number of the debug data format.                                                 
+	ULONG Type;           // The format of debugging information.This field enables support of multiple debuggers.For more information, see Debug Type.
+	ULONG SizeOfData;     // The size of the debug data (not including the debug directory itself).                                                   
+	ULONG AddressOfRawData;  // The address of the debug data when loaded, relative to the image base.                                                
+	ULONG PointerToRawData;  // The file pointer to the debug data.                                                
+};
+
+// Debug type
+constexpr UCHAR IMAGE_DEBUG_TYPE_UNKNOWN = 0x0; // An unknown value that is ignored by all tools.
+constexpr UCHAR IMAGE_DEBUG_TYPE_COFF = 0x1; // The COFF debug information(line numbers, symbol table, and string table).This type of debug information is also pointed to by fields in the file headers.
+constexpr UCHAR IMAGE_DEBUG_TYPE_CODEVIEW = 0x2; // The Visual C++ debug information.
+constexpr UCHAR IMAGE_DEBUG_TYPE_FPO = 0x3; // The frame pointer omission(FPO) information.This information tells the debugger how to interpret nonstandard stack frames, which use the EBP register for a purpose other than as a frame pointer.
+constexpr UCHAR IMAGE_DEBUG_TYPE_MISC = 0x4; // The location of DBG file. 
+constexpr UCHAR IMAGE_DEBUG_TYPE_EXCEPTION = 0x5; // A copy of.pdata section.
+constexpr UCHAR IMAGE_DEBUG_TYPE_FIXUP = 0x6; // Reserved. 
+constexpr UCHAR IMAGE_DEBUG_TYPE_OMAP_TO_SRC = 0x7; // The mapping from an RVA in image to an RVA in source image. 
+constexpr UCHAR IMAGE_DEBUG_TYPE_OMAP_FROM_SRC = 0x8; // The mapping from an RVA in source image to an RVA in image. 
+constexpr UCHAR IMAGE_DEBUG_TYPE_BORLAND = 0x9; 
+constexpr UCHAR IMAGE_DEBUG_TYPE_RESERVED10 = 0x10;
+constexpr UCHAR IMAGE_DEBUG_TYPE_CLSID = 0x11;
+constexpr UCHAR IMAGE_DEBUG_TYPE_REPRO = 0x16; // PE determinism or reproducibility. 
+constexpr UCHAR Undefined = 0x17 | 0x19;
+constexpr UCHAR IMAGE_DEBUG_TYPE_EX_DLLCHARACTERISTICS = 0x20; // Extended DLL characteristics bits.
+
+// Extended DLL Characteristics. The following values are defined for the extended DLL characteristics bits.
+constexpr UCHAR IMAGE_DLLCHARACTERISTICS_EX_CET_COMPAT = 0x0001; // Image is Control-flow Enforcement Technology (CET) Shadow Stack compatible.
+constexpr UCHAR IMAGE_DLLCHARACTERISTICS_EX_FORWARD_CFI_COMPAT = 0x0040; //  	All branch targets in all image code sections are annotated with forward-edge control flow integrity guard instructions such as x86 CET-Indirect Branch Tracking (IBT) or ARM Branch Target Identification (BTI) instructions. This bit is not used by Windows.
 // this class describes Portable executable format
 class PE
 {
